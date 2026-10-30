@@ -1,0 +1,116 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripSync | SQL Query Results</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#243047}
+header{background:#172554;color:white;padding:22px 6%}
+header h1{margin:0}
+header p{color:#cbd5e1}
+nav{background:white;padding:15px 6%;display:flex;gap:20px;flex-wrap:wrap;border-bottom:1px solid #e2e8f0}
+nav a{color:#334155;text-decoration:none;font-weight:bold}
+nav a:hover{color:#2563eb}
+main{max-width:1300px;margin:28px auto;padding:0 22px}
+.panel{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:22px;margin-bottom:20px}
+.subtitle{color:#64748b}
+.query-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:10px}
+.query-link{display:block;padding:12px;border:1px solid #e2e8f0;border-radius:8px;text-decoration:none;color:#334155;background:white}
+.query-link:hover{border-color:#2563eb;background:#eff6ff}
+.query-link.active{background:#dbeafe;border-color:#2563eb;color:#1d4ed8}
+.query-link small{display:block;color:#64748b;margin-top:5px}
+.table-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:600px;margin-top:12px}
+th,td{text-align:left;padding:12px;border-bottom:1px solid #e2e8f0;vertical-align:top}
+th{background:#f8fafc;color:#475569}
+.sql{white-space:pre-wrap;overflow-wrap:anywhere;background:#0f172a;color:#e2e8f0;padding:16px;border-radius:8px;font:13px/1.5 Consolas,monospace}
+.error{padding:12px;border-radius:7px;background:#fee2e2;color:#991b1b}
+.empty{color:#64748b;padding:14px 0}
+footer{text-align:center;padding:25px;color:#64748b}
+</style>
+</head>
+<body>
+<header>
+    <h1>TripSync</h1>
+    <p>SQL Query Results · Oracle Database</p>
+</header>
+
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/trips">My Trips</a>
+    <a href="/expenses">Expenses</a>
+    <a href="/queries">SQL Query Results</a>
+    <a href="/plsql">PL/SQL Demo</a>
+    <a href="/audit">Audit History</a>
+</nav>
+
+<main>
+<section class="panel">
+    <h2>15 SQL Queries</h2>
+    <p class="subtitle">
+        Select a query to execute it against Oracle and view its live results.
+    </p>
+
+    <div class="query-grid">
+        {% for number, query in query_list.items() %}
+        <a class="query-link {{ 'active' if number == query_id else '' }}"
+           href="{{ url_for('query_results', q=number) }}">
+            <strong>Query {{ number }}: {{ query.title }}</strong>
+            <small>{{ query.concept }}</small>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<section class="panel">
+    <h2>Query {{ query_id }} — {{ selected.title }}</h2>
+    <p class="subtitle">Concept: {{ selected.concept }}</p>
+
+    <h3>SQL executed</h3>
+    <div class="sql">{{ selected.sql }}</div>
+
+    {% if error %}
+        <h3>Database error</h3>
+        <div class="error">{{ error }}</div>
+        <p class="subtitle">
+            Check the Oracle connection and confirm the tables and columns exist.
+        </p>
+    {% else %}
+        <h3>Results ({{ rows|length }} row(s))</h3>
+
+        {% if rows %}
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        {% for column in columns %}
+                        <th>{{ column }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in rows %}
+                    <tr>
+                        {% for value in row %}
+                        <td>{{ value if value is not none else '—' }}</td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="empty">
+            The query ran successfully but returned no rows for the current data.
+        </p>
+        {% endif %}
+    {% endif %}
+</section>
+</main>
+
+<footer>TripSync · Database Systems Project</footer>
+</body>
+</html>

@@ -1,0 +1,135 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripSync | PL/SQL Demo</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#f4f7fb;color:#243047}
+header{background:#172554;color:white;padding:22px 6%}
+header h1{margin:0}
+header p{color:#cbd5e1}
+nav{background:white;padding:15px 6%;display:flex;gap:20px;flex-wrap:wrap;border-bottom:1px solid #e2e8f0}
+nav a{color:#334155;text-decoration:none;font-weight:bold}
+nav a:hover{color:#2563eb}
+main{max-width:1150px;margin:28px auto;padding:0 22px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.panel{background:white;border:1px solid #e2e8f0;border-radius:12px;padding:22px;margin-bottom:18px}
+.panel h2{margin-top:0}
+.subtitle{color:#64748b}
+.field{margin:12px 0}
+label{display:block;font-weight:bold;font-size:14px;margin-bottom:6px}
+input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:7px;font-size:14px}
+button{background:#2563eb;color:white;border:0;border-radius:7px;padding:11px 14px;font-weight:bold;cursor:pointer}
+button:hover{background:#1d4ed8}
+.output{white-space:pre-wrap;background:#f8fafc;border:1px solid #e2e8f0;padding:15px;border-radius:8px;overflow-wrap:anywhere}
+.error{background:#fee2e2;color:#991b1b;padding:12px;border-radius:7px}
+footer{text-align:center;padding:25px;color:#64748b}
+</style>
+</head>
+<body>
+<header>
+    <h1>TripSync</h1>
+    <p>Stored procedures, functions and explicit cursor demonstration</p>
+</header>
+
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/trips">My Trips</a>
+    <a href="/expenses">Expenses</a>
+    <a href="/queries">SQL Query Results</a>
+    <a href="/plsql">PL/SQL Demo</a>
+    <a href="/audit">Audit History</a>
+</nav>
+
+<main>
+<section class="panel">
+    <h2>PL/SQL Demonstrations</h2>
+    <p class="subtitle">
+        Use IDs that exist in your Oracle database.
+    </p>
+</section>
+
+{% if error %}
+<section class="panel">
+    <div class="error">
+        <strong>Could not complete this demonstration:</strong> {{ error }}
+    </div>
+</section>
+{% endif %}
+
+{% if result_label %}
+<section class="panel">
+    <h2>{{ result_label }}</h2>
+    {% if result_value is not none %}
+    <p><strong>Result:</strong> {{ result_value }}</p>
+    {% endif %}
+    {% if output_lines %}
+    <div class="output">{% for line in output_lines %}{{ line }}
+{% endfor %}</div>
+    {% endif %}
+</section>
+{% endif %}
+
+<div class="cards">
+<section class="panel">
+    <h2>Total expense</h2>
+    <p class="subtitle">Returns the total expenses for a trip.</p>
+    <form method="post">
+        <input type="hidden" name="action" value="total">
+        <div class="field">
+            <label for="total_trip">Trip ID</label>
+            <input id="total_trip" type="number" name="trip_id" min="1" value="1" required>
+        </div>
+        <button type="submit">Run total function</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Expense count</h2>
+    <p class="subtitle">Counts expense records for a trip.</p>
+    <form method="post">
+        <input type="hidden" name="action" value="count">
+        <div class="field">
+            <label for="count_trip">Trip ID</label>
+            <input id="count_trip" type="number" name="trip_id" min="1" value="1" required>
+        </div>
+        <button type="submit">Run count function</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Display trip expenses</h2>
+    <p class="subtitle">Fetches expense rows one by one using an explicit cursor.</p>
+    <form method="post">
+        <input type="hidden" name="action" value="cursor">
+        <div class="field">
+            <label for="cursor_trip">Trip ID</label>
+            <input id="cursor_trip" type="number" name="trip_id" min="1" value="1" required>
+        </div>
+        <button type="submit">Run cursor procedure</button>
+    </form>
+</section>
+
+<section class="panel">
+    <h2>Get trips</h2>
+    <p class="subtitle">Displays trips belonging to a user.</p>
+    <form method="post">
+        <input type="hidden" name="action" value="user_trips">
+        <div class="field">
+            <label for="user_id">User ID</label>
+            <input id="user_id" type="number" name="user_id" min="1" value="1" required>
+        </div>
+        <button type="submit">Run user trips procedure</button>
+    </form>
+</section>
+
+
+</div>
+</main>
+
+<footer>TripSync · Database Systems Project</footer>
+</body>
+</html>

@@ -1,0 +1,317 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripSync | Dashboard</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #243047;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 6%;
+        }
+
+        header h1 { margin: 0; font-size: 28px; }
+
+        header p {
+            margin: 7px 0 0;
+            color: #cbd5e1;
+        }
+
+        nav {
+            background: white;
+            padding: 15px 6%;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        nav a {
+            color: #334155;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover { color: #2563eb; }
+
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 22px;
+        }
+
+        .welcome { margin-bottom: 25px; }
+        .welcome h2 { margin-bottom: 8px; }
+        .welcome p { color: #64748b; }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card, .panel, .feature-card {
+            background: white;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 3px 10px #0f172a08;
+        }
+
+        .stat-card { padding: 23px; }
+
+        .stat-card p {
+            margin: 0;
+            color: #64748b;
+        }
+
+        .stat-card h3 {
+            font-size: 29px;
+            margin: 13px 0 0;
+            color: #172554;
+            overflow-wrap: anywhere;
+        }
+
+        .section-heading { margin: 34px 0 18px; }
+
+        .section-heading p {
+            color: #64748b;
+            margin-top: 6px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
+            gap: 18px;
+        }
+
+        .feature-card {
+            padding: 22px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 10px;
+            color: #172554;
+        }
+
+        .feature-card p {
+            color: #64748b;
+            line-height: 1.5;
+            flex: 1;
+        }
+
+        .tag {
+            display: inline-block;
+            align-self: flex-start;
+            font-size: 12px;
+            color: #1d4ed8;
+            background: #e8efff;
+            padding: 7px 9px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+
+        .feature-button {
+            display: inline-block;
+            text-align: center;
+            text-decoration: none;
+            background: #1d4ed8;
+            color: white;
+            padding: 11px 14px;
+            border-radius: 7px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .feature-button:hover { background: #1e40af; }
+
+        .panel {
+            padding: 23px;
+            margin-top: 30px;
+            overflow-x: auto;
+        }
+
+        .panel h2 { margin-top: 0; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 650px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 14px 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .status {
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+        }
+
+        .empty { color: #64748b; padding: 20px 0; }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            padding: 25px;
+        }
+
+        @media (max-width: 600px) {
+            nav { gap: 15px; }
+            header h1 { font-size: 24px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>TripSync</h1>
+        <p>Your travel planning and expense management system</p>
+    </header>
+
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/trips">My Trips</a>
+        <a href="/expenses">Expenses</a>
+        <a href="/plsql">PL/SQL Demo</a>
+        <a href="/audit">Audit History</a>
+    </nav>
+
+    <main>
+        <section class="welcome">
+            <h2>Dashboard Overview</h2>
+            <p>View your travel information and spending at a glance.</p>
+        </section>
+
+        <section class="stats">
+            <div class="stat-card">
+                <p>Total Trips</p>
+                <h3>{{ trip_count }}</h3>
+            </div>
+
+            <div class="stat-card">
+                <p>Total Expenses</p>
+                <h3>{{ expense_count }}</h3>
+            </div>
+
+            <div class="stat-card">
+                <p>Total Spending</p>
+                <h3>₹{{ "{:,.2f}".format(total_expenses or 0) }}</h3>
+            </div>
+
+            <div class="stat-card">
+                <p>Registered Users</p>
+                <h3>{{ user_count }}</h3>
+            </div>
+        </section>
+
+        <section>
+            <div class="section-heading">
+                <h2>Explore TripSync Features</h2>
+                <p>
+                    Select a feature to retrieve live results from the Oracle database.
+                </p>
+            </div>
+
+            <div class="feature-grid">
+                <article class="feature-card">
+                    <h3>Trip Budget Summary</h3>
+                    <span class="tag">SUM · JOIN · NVL</span>
+                    <p>See how much each trip costs and how much of its budget remains.</p>
+                    <a class="feature-button" href="/feature/15">View Budget Summary →</a>
+                </article>
+
+                <article class="feature-card">
+                    <h3>Planned Trips</h3>
+                    <span class="tag">WHERE · ORDER BY</span>
+                    <p>Find trips marked as planned, sorted by their budget.</p>
+                    <a class="feature-button" href="/feature/10">Show Planned Trips →</a>
+                </article>
+
+                <article class="feature-card">
+                    <h3>Spending Analysis</h3>
+                    <span class="tag">COUNT · AVG · GROUP BY</span>
+                    <p>Compare the number of expenses, total spending and average amount by category.</p>
+                    <a class="feature-button" href="/feature/5">Analyse Spending →</a>
+                </article>
+
+                <article class="feature-card">
+                    <h3>Trips Without Expenses</h3>
+                    <span class="tag">LEFT JOIN · IS NULL</span>
+                    <p>Identify trips that currently have no expense records.</p>
+                    <a class="feature-button" href="/feature/4">Find Unspent Trips →</a>
+                </article>
+
+                <article class="feature-card">
+                    <h3>Travel Companions</h3>
+                    <span class="tag">MULTIPLE JOINs</span>
+                    <p>View which companions are associated with each trip and traveller.</p>
+                    <a class="feature-button" href="/feature/13">View Companions →</a>
+                </article>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2>Recent Trips</h2>
+
+            {% if recent_trips %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Trip ID</th>
+                        <th>Trip Name</th>
+                        <th>Traveller</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Budget</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for trip in recent_trips %}
+                    <tr>
+                        <td>{{ trip[0] }}</td>
+                        <td>{{ trip[1] }}</td>
+                        <td>{{ trip[2] }}</td>
+                        <td>{{ trip[3].strftime('%d-%m-%Y') if trip[3] else '-' }}</td>
+                        <td>{{ trip[4].strftime('%d-%m-%Y') if trip[4] else '-' }}</td>
+                        <td>₹{{ "{:,.2f}".format(trip[5] or 0) }}</td>
+                        <td><span class="status">{{ trip[6] or 'N/A' }}</span></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+                <p class="empty">No trips found in the database.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>TripSync · Database Systems Project</footer>
+</body>
+</html>

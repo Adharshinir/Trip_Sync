@@ -1,0 +1,203 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ feature.title }} | TripSync</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #243047;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 6%;
+        }
+
+        header h1 { margin: 0; }
+
+        header p {
+            color: #cbd5e1;
+            margin-bottom: 0;
+        }
+
+        nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 22px;
+            padding: 15px 6%;
+            background: white;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #334155;
+            font-weight: bold;
+        }
+
+        nav a:hover { color: #2563eb; }
+
+        main {
+            max-width: 1200px;
+            margin: 32px auto;
+            padding: 0 22px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 22px;
+        }
+
+        .description { color: #64748b; }
+
+        .concept {
+            display: inline-block;
+            background: #e8efff;
+            color: #1d4ed8;
+            padding: 8px 12px;
+            border-radius: 7px;
+            font-size: 13px;
+        }
+
+        .table-wrap { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 550px;
+            margin-top: 18px;
+        }
+
+        th, td {
+            padding: 13px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        td { overflow-wrap: anywhere; }
+
+        .count {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .error {
+            color: #b91c1c;
+            background: #fef2f2;
+            padding: 14px;
+            border-radius: 8px;
+            overflow-wrap: anywhere;
+        }
+
+        .empty { color: #64748b; }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 18px;
+            text-decoration: none;
+            color: #2563eb;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #64748b;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>TripSync</h1>
+        <p>Travel planning and expense management</p>
+    </header>
+
+    <nav>
+        <a href="/">Dashboard</a>
+        <a href="/trips">My Trips</a>
+        <a href="/expenses">Expenses</a>
+        <a href="/plsql">PL/SQL Demo</a>
+        <a href="/audit">Audit History</a>
+    </nav>
+
+    <main>
+        <a class="back" href="/">← Back to Dashboard</a>
+
+        <section class="panel">
+            <h2>{{ feature.title }}</h2>
+            <p class="description">{{ feature.description }}</p>
+            <span class="concept">
+                SQL concepts: {{ feature.concept }}
+            </span>
+
+            {% if error %}
+                <p class="error">
+                    The database query could not be completed: {{ error }}
+                </p>
+            {% else %}
+                <p class="count">
+                    Query executed successfully · {{ rows|length }} result row(s)
+                </p>
+
+                {% if rows %}
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    {% for column in columns %}
+                                        <th>{{ column.replace('_', ' ')|title }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for row in rows %}
+                                    <tr>
+                                        {% for value in row %}
+                                            <td>
+                                                {% if value is none %}
+                                                    -
+                                                {% elif value is number %}
+                                                    {{ "{:,.2f}".format(value) if value is float else value }}
+                                                {% elif value.strftime is defined %}
+                                                    {{ value.strftime('%d-%m-%Y %H:%M') }}
+                                                {% else %}
+                                                    {{ value }}
+                                                {% endif %}
+                                            </td>
+                                        {% endfor %}
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p class="empty">
+                        The query executed successfully, but no matching records were found.
+                    </p>
+                {% endif %}
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>TripSync · Database Systems Project</footer>
+</body>
+</html>

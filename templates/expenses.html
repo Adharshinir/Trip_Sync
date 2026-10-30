@@ -1,0 +1,358 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripSync | Expenses</title>
+
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #243047;
+        }
+
+        header {
+            background: #172554;
+            color: white;
+            padding: 22px 6%;
+        }
+
+        header h1 { margin: 0; }
+
+        header p {
+            color: #cbd5e1;
+            margin-bottom: 0;
+        }
+
+        nav {
+            background: white;
+            padding: 16px 6%;
+            display: flex;
+            gap: 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        nav a {
+            color: #334155;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        nav a:hover { color: #2563eb; }
+
+        main {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 22px;
+        }
+
+        .panel {
+            background: white;
+            padding: 24px;
+            margin-bottom: 24px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+
+        .panel h2 { margin-top: 0; }
+
+        .subtitle {
+            color: #64748b;
+            margin-top: -5px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            font-size: 14px;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: 2px solid #bfdbfe;
+            border-color: #2563eb;
+        }
+
+        button {
+            border: none;
+            border-radius: 7px;
+            padding: 10px 14px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .primary:hover { background: #1d4ed8; }
+
+        .edit {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .delete {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .form-actions {
+            margin-top: 20px;
+        }
+
+        .table-wrapper { overflow-x: auto; }
+
+        table {
+            width: 100%;
+            min-width: 850px;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 13px 10px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        th {
+            background: #f8fafc;
+            color: #475569;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 7px;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .empty {
+            color: #64748b;
+            padding: 20px 0;
+        }
+
+        footer {
+            text-align: center;
+            color: #64748b;
+            padding: 25px;
+        }
+
+        @media (max-width: 600px) {
+            nav { flex-wrap: wrap; gap: 15px; }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>TripSync</h1>
+        <p>Travel planning and expense management system</p>
+    </header>
+
+<nav>
+    <a href="/">Dashboard</a>
+    <a href="/trips">My Trips</a>
+    <a href="/expenses">Expenses</a>
+    <a href="/queries">SQL Query Results</a>
+    <a href="/plsql">PL/SQL Demo</a>
+    <a href="/audit">Audit History</a>
+</nav>
+
+    <main>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message {{ category }}">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <section class="panel">
+            <h2>Add an Expense</h2>
+            <p class="subtitle">
+                Record a new expense against one of your existing trips.
+            </p>
+
+            <form action="/expenses/add" method="POST">
+                <div class="form-grid">
+                    <div>
+                        <label for="trip_id">Trip</label>
+                        <select id="trip_id" name="trip_id" required>
+                            <option value="">Select a trip</option>
+                            {% for trip in trips %}
+                                <option value="{{ trip[0] }}">
+                                    {{ trip[0] }} - {{ trip[1] }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="expense_name">Expense Name</label>
+                        <input id="expense_name" name="expense_name"
+                               type="text" maxlength="100"
+                               placeholder="e.g. Hotel Booking" required>
+                    </div>
+
+                    <div>
+                        <label for="amount">Amount (₹)</label>
+                        <input id="amount" name="amount"
+                               type="number" min="0" step="0.01"
+                               placeholder="e.g. 2500" required>
+                    </div>
+
+                    <div>
+                        <label for="expense_date">Expense Date</label>
+                        <input id="expense_date" name="expense_date"
+                               type="date" required>
+                    </div>
+
+                    <div>
+                        <label for="category">Category</label>
+                        <select id="category" name="category" required>
+                            <option value="">Select category</option>
+                            <option value="Accommodation">Accommodation</option>
+                            <option value="Transport">Transport</option>
+                            <option value="Food">Food</option>
+                            <option value="Activities">Activities</option>
+                            <option value="Shopping">Shopping</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button class="primary" type="submit">+ Add Expense</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <h2>Expense Records</h2>
+            <p class="subtitle">
+                Edit an expense or delete a record from the database.
+            </p>
+
+            {% if expenses %}
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Trip</th>
+                            <th>Expense</th>
+                            <th>Amount</th>
+                            <th>Date</th>
+                            <th>Category</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        {% for expense in expenses %}
+                        <tr>
+                            <td>{{ expense[0] }}</td>
+                            <td>{{ expense[1] }} - {{ expense[2] }}</td>
+
+                            <td>
+                                <form id="edit-{{ expense[0] }}"
+                                      action="/expenses/update/{{ expense[0] }}"
+                                      method="POST">
+                                    <input type="text" name="expense_name"
+                                           value="{{ expense[3] }}"
+                                           maxlength="100" required
+                                           aria-label="Expense name">
+                                </form>
+                            </td>
+
+                            <td>
+                                <input type="number" name="amount"
+                                       form="edit-{{ expense[0] }}"
+                                       value="{{ expense[4] }}"
+                                       min="0" step="0.01" required
+                                       aria-label="Amount">
+                            </td>
+
+                            <td>
+                                <input type="date" name="expense_date"
+                                       form="edit-{{ expense[0] }}"
+                                       value="{{ expense[5].strftime('%Y-%m-%d') if expense[5] else '' }}"
+                                       required aria-label="Expense date">
+                            </td>
+
+                            <td>
+                                <input type="text" name="category"
+                                       form="edit-{{ expense[0] }}"
+                                       value="{{ expense[6] or '' }}"
+                                       maxlength="50" required
+                                       aria-label="Category">
+                            </td>
+
+                            <td>
+                                <div class="row-actions">
+                                    <button class="edit" type="submit"
+                                            form="edit-{{ expense[0] }}">
+                                        Save
+                                    </button>
+
+                                    <form action="/expenses/delete/{{ expense[0] }}"
+                                          method="POST"
+                                          onsubmit="return confirm('Delete this expense record?');">
+                                        <button class="delete" type="submit">
+                                            Delete
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+                <p class="empty">No expense records found.</p>
+            {% endif %}
+        </section>
+    </main>
+
+    <footer>TripSync · Database Systems Project</footer>
+</body>
+</html>
